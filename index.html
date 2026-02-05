@@ -27,13 +27,16 @@
         </div>
 
         <div id="result" class="hidden">
-            <h1>❤️ SHE SAID YES! ❤️</h1>
+            <h1 id="main-result">❤️ SHE SAID YES! ❤️</h1>
             <h2 id="love-msg"></h2>
         </div>
     </div>
 
     <script>
+        let noCount = 0;
+
         function typeWriter(id, text, i = 0, speed = 50, callback = null) {
+            if (i === 0) document.getElementById(id).innerHTML = ""; 
             if (i < text.length) {
                 document.getElementById(id).innerHTML += text.charAt(i);
                 setTimeout(() => typeWriter(id, text, i + 1, speed, callback), speed);
@@ -42,10 +45,8 @@
             }
         }
 
-        // Start the sequence
         typeWriter("text-1", "Hey honey, I hope you slept okay:). I have a really important question to ask. Want to hear my question?");
 
-        // Logic for the first input
         document.getElementById("input-1").addEventListener("keypress", function(e) {
             if (e.key === "Enter") {
                 const ans = this.value.toLowerCase();
@@ -53,21 +54,36 @@
                 document.getElementById("step-final").classList.remove("hidden");
                 document.getElementById("input-final").focus();
 
-                if (ans.includes("no")) {
-                    typeWriter("text-final", "Well I'm going to ask anyway... WILL YOU BE MY VALENTINE POOKIE?", 0, 60);
-                } else {
-                    typeWriter("text-final", "WILL YOU BE MY VALENTINE POOKIE?", 0, 80);
-                }
+                let promptText = ans.includes("no") 
+                    ? "Well I'm going to ask anyway... WILL YOU BE MY VALENTINE POOKIE?" 
+                    : "WILL YOU BE MY VALENTINE POOKIE?";
+                typeWriter("text-final", promptText, 0, 60);
             }
         });
 
-        // Logic for the final reveal
         document.getElementById("input-final").addEventListener("keypress", function(e) {
             if (e.key === "Enter") {
-                document.getElementById("step-final").classList.add("hidden");
-                document.getElementById("result").classList.remove("hidden");
-                // Final slow romantic type-out
-                typeWriter("love-msg", "I LOVE YOU SO MUCH", 0, 100);
+                const ans = this.value.toLowerCase();
+                
+                if (ans.includes("yes")) {
+                    // Success Path
+                    document.getElementById("step-final").classList.add("hidden");
+                    document.getElementById("result").classList.remove("hidden");
+                    typeWriter("love-msg", "I LOVE YOU SO MUCH", 0, 100);
+                } else {
+                    // The "No" Logic
+                    noCount++;
+                    this.value = ""; // Clear input for next try
+                    
+                    if (noCount === 1) {
+                        typeWriter("text-final", "Sorry, try that again?", 0, 60);
+                    } else {
+                        document.getElementById("step-final").classList.add("hidden");
+                        document.getElementById("result").classList.remove("hidden");
+                        document.getElementById("main-result").innerHTML = "❤️ Sorry you don't have a choice ❤️";
+                        typeWriter("love-msg", "I LOVE YOU SO MUCH POOKIE", 0, 100);
+                    }
+                }
             }
         });
     </script>
