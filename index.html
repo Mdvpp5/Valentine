@@ -1,1 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A Special Message</title>
+    <style>
+        body { background-color: #1a1a1a; color: #ff4d4d; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; }
+        #container { max-width: 600px; padding: 20px; border: 1px solid #333; border-radius: 10px; background: #222; box-shadow: 0 0 20px rgba(255, 77, 77, 0.2); }
+        input { background: none; border: none; border-bottom: 2px solid #ff4d4d; color: white; font-family: inherit; font-size: 1.2rem; outline: none; text-align: center; width: 80%; margin-top: 20px; padding: 10px; }
+        .hidden { display: none; }
+        .box { border: 2px solid #ff4d4d; padding: 20px; margin-top: 20px; font-weight: bold; background: rgba(255, 77, 77, 0.1); }
+        p { line-height: 1.6; min-height: 3em; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="step-1">
+            <p id="text-1"></p>
+            <input type="text" id="input-1" placeholder="Type yes/no & press Enter" autofocus>
+        </div>
+        <div id="step-2" class="hidden">
+            <p id="text-2"></p>
+            <input type="text" id="input-2" placeholder="Tell me here...">
+        </div>
+        <div id="step-final" class="hidden">
+            <div class="box">
+                <p>WILL YOU BE MY VALENTINE?</p>
+            </div>
+            <input type="text" id="input-3" placeholder="yes/no">
+        </div>
+        <div id="result" class="hidden">
+            <h1 id="final-msg">❤️ SHE SAID YES! ❤️</h1>
+            <p>I can't wait to see you.</p>
+        </div>
+    </div>
 
+    <script>
+        function typeWriter(id, text, i = 0) {
+            if (i < text.length) {
+                document.getElementById(id).innerHTML += text.charAt(i);
+                setTimeout(() => typeWriter(id, text, i + 1), 40);
+            }
+        }
+
+        // Initial Start
+        typeWriter("text-1", "SYSTEM INITIALIZED. I have a few questions for you. Ready to begin?");
+
+        // Question 1 -> 2
+        document.getElementById("input-1").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                document.getElementById("step-1").classList.add("hidden");
+                document.getElementById("step-2").classList.remove("hidden");
+                document.getElementById("input-2").focus();
+                typeWriter("text-2", "First... what is your favorite memory of us so far?");
+            }
+        });
+
+        // Question 2 -> Final
+        document.getElementById("input-2").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                document.getElementById("step-2").classList.add("hidden");
+                document.getElementById("step-final").classList.remove("hidden");
+                document.getElementById("input-3").focus();
+            }
+        });
+
+        // Final -> Result
+        document.getElementById("input-3").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                const val = this.value.toLowerCase();
+                document.getElementById("step-final").classList.add("hidden");
+                document.getElementById("result").classList.remove("hidden");
+                if (val !== 'yes') {
+                    document.getElementById("final-msg").innerHTML = "Error: Logic overflow. 😉 <br> (I'll take that as a yes!)";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
