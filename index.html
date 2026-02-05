@@ -5,12 +5,26 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: #1a1a1a; color: #ff4d4d; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; overflow: hidden; }
-        #container { max-width: 600px; padding: 30px; border: 1px solid #333; border-radius: 15px; background: #222; box-shadow: 0 0 25px rgba(255, 77, 77, 0.3); z-index: 10; }
+        #container { max-width: 600px; padding: 30px; border: 1px solid #333; border-radius: 15px; background: #222; box-shadow: 0 0 25px rgba(255, 77, 77, 0.3); z-index: 10; position: relative; }
         input { background: none; border: none; border-bottom: 2px solid #ff4d4d; color: white; font-family: inherit; font-size: 1.2rem; outline: none; text-align: center; width: 80%; margin-top: 25px; padding: 10px; }
         .hidden { display: none; }
         .box { border: 2px solid #ff4d4d; padding: 25px; margin-top: 20px; font-weight: bold; background: rgba(255, 77, 77, 0.1); }
         p { line-height: 1.6; font-size: 1.2rem; min-height: 3em; }
-        h1 { margin-bottom: 10px; }
+        
+        /* The Spinning Animation */
+        #pookie-pic {
+            width: 200px;
+            height: auto;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 3px solid #ff4d4d;
+            animation: spinIn 1.5s ease-out forwards;
+        }
+
+        @keyframes spinIn {
+            0% { transform: scale(0) rotate(-720deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -29,6 +43,7 @@
 
         <div id="result" class="hidden">
             <h1 id="main-result">❤️ SHE SAID YES! ❤️</h1>
+            <img id="pookie-pic" src="IMG_9295" alt="Pookie">
             <h2 id="love-msg"></h2>
         </div>
     </div>
@@ -40,17 +55,11 @@
             const duration = 5 * 1000;
             const animationEnd = Date.now() + duration;
             const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
             const interval = setInterval(function() {
               const timeLeft = animationEnd - Date.now();
               if (timeLeft <= 0) return clearInterval(interval);
               const particleCount = 50 * (timeLeft / duration);
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
             }, 250);
         }
 
@@ -59,9 +68,7 @@
             if (i < text.length) {
                 document.getElementById(id).innerHTML += text.charAt(i);
                 setTimeout(() => typeWriter(id, text, i + 1, speed, callback), speed);
-            } else if (callback) {
-                callback();
-            }
+            } else if (callback) { callback(); }
         }
 
         typeWriter("text-1", "Hey honey, I hope you slept okay:). I have a really important question to ask. Want to hear my question?");
@@ -72,10 +79,7 @@
                 document.getElementById("step-1").classList.add("hidden");
                 document.getElementById("step-final").classList.remove("hidden");
                 document.getElementById("input-final").focus();
-
-                let promptText = ans.includes("no") 
-                    ? "Well I'm going to ask anyway... WILL YOU BE MY VALENTINE POOKIE?" 
-                    : "WILL YOU BE MY VALENTINE POOKIE?";
+                let promptText = ans.includes("no") ? "Well I'm going to ask anyway... WILL YOU BE MY VALENTINE POOKIE?" : "WILL YOU BE MY VALENTINE POOKIE?";
                 typeWriter("text-final", promptText, 0, 60);
             }
         });
@@ -83,28 +87,27 @@
         document.getElementById("input-final").addEventListener("keypress", function(e) {
             if (e.key === "Enter") {
                 const ans = this.value.toLowerCase();
-                
                 if (ans.includes("yes")) {
-                    document.getElementById("step-final").classList.add("hidden");
-                    document.getElementById("result").classList.remove("hidden");
-                    fireConfetti();
-                    typeWriter("love-msg", "I LOVE YOU SO MUCH", 0, 100);
+                    showFinalResult("❤️ SHE SAID YES! ❤️", "I LOVE YOU SO MUCH");
                 } else {
                     noCount++;
                     this.value = "";
-                    
                     if (noCount === 1) {
                         typeWriter("text-final", "Sorry, try that again?", 0, 60);
                     } else {
-                        document.getElementById("step-final").classList.add("hidden");
-                        document.getElementById("result").classList.remove("hidden");
-                        document.getElementById("main-result").innerHTML = "❤️ Sorry you don't have a choice ❤️";
-                        fireConfetti();
-                        typeWriter("love-msg", "I LOVE YOU SO MUCH POOKIE", 0, 100);
+                        showFinalResult("❤️ Sorry you don't have a choice ❤️", "I LOVE YOU SO MUCH POOKIE");
                     }
                 }
             }
         });
+
+        function showFinalResult(mainText, subText) {
+            document.getElementById("step-final").classList.add("hidden");
+            document.getElementById("result").classList.remove("hidden");
+            document.getElementById("main-result").innerHTML = mainText;
+            fireConfetti();
+            typeWriter("love-msg", subText, 0, 100);
+        }
     </script>
 </body>
 </html>
